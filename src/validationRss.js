@@ -7,7 +7,12 @@ export default (rssLink, state) => {
     .url()
     .test((rssURL) => {
       const { rss } = state;
-      return !rss.includes(rssURL);
+
+      if (!rss.includes(rssURL)) {
+        return true;
+      }
+
+      throw new Error('alreadyExists');
     });
 
   return rssSchema.isValid(rssLink);
