@@ -31,8 +31,12 @@ const runApp = (initialState) => {
     debug: false,
     resources,
   });
-  const rssAddForm = document.querySelector('.rss-form');
-  const rssFormInput = document.querySelector('#url-input');
+
+  const elements = {
+    rssAddForm: document.querySelector('.rss-form'),
+    rssFormInput: document.querySelector('#url-input'),
+    detailPostModal: document.querySelector('#post-detail-modal'),
+  };
 
   const state = { ...initialState };
   const watchedState = onChange(state, (path, value) => {
@@ -47,13 +51,36 @@ const runApp = (initialState) => {
         const type = value === 'loaded' ? 'success' : 'danger';
         renderRssFormStatusMessage(i18n.t(`rssFormStatuses.${value}`), type);
         if (value === 'loaded') {
-          rssFormInput.classList.remove('is-invalid');
-          rssAddForm.reset();
-          rssFormInput.focus();
+          elements.rssFormInput.classList.remove('is-invalid');
+          elements.rssAddForm.reset();
+          elements.rssFormInput.focus();
         }
         if (value === 'error') {
-          rssFormInput.classList.add('is-invalid');
+          elements.rssFormInput.classList.add('is-invalid');
         }
+        break;
+      }
+      case 'watchedPost':
+        if (value !== null) {
+          const { title, description, link } = value;
+
+          const modalTitle = elements.detailPostModal.querySelector('.modal-title');
+          modalTitle.textContent = title;
+
+          const modalDescription = elements.detailPostModal.querySelector('.modal-body');
+          modalDescription.textContent = description;
+
+          const modalDetailLink = elements.detailPostModal.querySelector('.btn-detail-link');
+          modalDetailLink.setAttribute('href', link);
+
+          watchedState.watchedPost = null;
+        }
+        break;
+      case 'uiState.readPosts': {
+        const postId = watchedState.uiState.readPosts.at(-1);
+        const postLink = document.querySelector(`[data-post-id="${postId}"]`);
+        postLink.classList.remove('fw-bold');
+        postLink.classList.add('fw-normal', 'link-secondary');
         break;
       }
       default:
@@ -61,9 +88,9 @@ const runApp = (initialState) => {
     }
   });
 
-  rssAddForm.addEventListener('submit', (evt) => {
+  elements.rssAddForm.addEventListener('submit', (evt) => {
     evt.preventDefault();
-    const rssUrl = new FormData(rssAddForm).get('url');
+    const rssUrl = new FormData(elements.rssAddForm).get('url');
     validationRss(rssUrl, watchedState)
       .then((isValid) => {
         if (!isValid) {
@@ -84,6 +111,15 @@ const runApp = (initialState) => {
       });
 
     checkRssResources(watchedState);
+  });
+
+  elements.detailPostModal.addEventListener('show.bs.modal', (evt) => {
+    const btn = evt.relatedTarget;
+    const { postId } = btn.dataset;
+    watchedState.watchedPost = watchedState.posts.find(({ id }) => id === postId);
+    if (!watchedState.uiState.readPosts.includes(postId)) {
+      watchedState.uiState.readPosts.push(postId);
+    }
   });
 };
 

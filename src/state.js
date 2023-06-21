@@ -4,6 +4,10 @@ export default () => ({
   rss: [],
   posts: [],
   rssFormStatus: '',
+  watchedPost: null,
+  uiState: {
+    readPosts: [],
+  },
 });
 
 export const saveRss = (rssList, rssFeed, link) => {

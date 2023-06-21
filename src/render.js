@@ -29,7 +29,8 @@ export const renderFeedsList = ({ rss }) => {
   rssListWrapper.classList.add('d-none');
 };
 
-export const renderPosts = ({ posts }, i18n) => {
+export const renderPosts = (state, i18n) => {
+  const { posts } = state;
   const postsListWrapper = document.querySelector('.posts-list-wrapper');
 
   if (posts.length > 0) {
@@ -38,20 +39,26 @@ export const renderPosts = ({ posts }, i18n) => {
     postsListWrapper.classList.remove('d-none');
     const list = document.createElement('ul');
     list.classList.add('list-group', 'border-0', 'rounded-0');
-    posts.forEach((rssItem) => {
-      const { title, link } = rssItem;
+    posts.forEach((post) => {
+      const { id, title, link } = post;
       const listItem = document.createElement('li');
       listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
       const postTitle = document.createElement('a');
-      postTitle.classList.add('fw-bold');
+      const classesToPost = state.uiState.readPosts.includes(id) ? ['fw-normal', 'link-secondary'] : ['fw-bold'];
+      postTitle.classList.add(...classesToPost);
       postTitle.textContent = title;
       postTitle.setAttribute('href', link);
+      postTitle.setAttribute('target', '_blank');
+      postTitle.setAttribute('data-post-id', id);
       listItem.append(postTitle);
 
       const postMoreBtn = document.createElement('button');
       postMoreBtn.classList.add('btn', 'btn-outline-primary', 'btn-sm');
       postMoreBtn.textContent = i18n.t('postsList.view');
+      postMoreBtn.setAttribute('data-post-id', id);
+      postMoreBtn.dataset.bsToggle = 'modal';
+      postMoreBtn.dataset.bsTarget = '#post-detail-modal';
       listItem.append(postMoreBtn);
 
       list.append(listItem);
