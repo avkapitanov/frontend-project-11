@@ -6,6 +6,22 @@ import loadRssResource from './api';
 import parseData from './parser';
 import { savePosts, saveRss } from './state';
 import { renderFeedsList, renderPosts, renderRssFormStatusMessage } from './render';
+import { CHECK_RSS_RESOURCES_TIME } from './const';
+
+const checkRssResources = (state) => {
+  setTimeout(() => {
+    Promise.all(state.rss.map(({ link }) => loadRssResource(link)))
+      .then((data) => {
+        data.forEach((rssData, ind) => {
+          const { posts } = parseData(rssData);
+          const { id: rssId } = state.rss[ind];
+
+          savePosts(state.posts, posts, rssId);
+        });
+        checkRssResources(state);
+      });
+  }, CHECK_RSS_RESOURCES_TIME);
+};
 
 const runApp = (initialState) => {
   const defaultLanguage = 'ru';
@@ -57,16 +73,17 @@ const runApp = (initialState) => {
       })
       .then((data) => {
         const { posts, rssFeed } = parseData(data);
-        const { rssList, newRssItem } = saveRss(watchedState.rss, rssFeed, rssUrl);
-        watchedState.rss = rssList;
+        const newRssItem = saveRss(watchedState.rss, rssFeed, rssUrl);
         const { id: rssId } = newRssItem;
-        watchedState.posts = savePosts(watchedState.posts, posts, rssId);
+        savePosts(watchedState.posts, posts, rssId);
         watchedState.rssFormStatus = 'loaded';
       })
       .catch((error) => {
         watchedState.rssFormStatus = error.message;
         watchedState.rssFormStatus = 'invalidUrl';
       });
+
+    checkRssResources(watchedState);
   });
 };
 

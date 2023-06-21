@@ -6,25 +6,29 @@ export default () => ({
   rssFormStatus: '',
 });
 
-export const saveRss = (rsslist, rssFeed, link) => {
+export const saveRss = (rssList, rssFeed, link) => {
   const newRssItem = {
     id: uniqueId(),
     ...rssFeed,
     link,
   };
 
-  return {
-    rssList: [newRssItem, ...rsslist],
-    newRssItem,
-  };
+  rssList.push(newRssItem);
+
+  return newRssItem;
 };
 
 export const savePosts = (postsList, posts, rssId) => {
-  const postsToAdd = posts.map((post) => ({
+  const postsByRss = postsList.filter((post) => post.rssId === rssId);
+  let postsToAdd = posts;
+  if (postsByRss.length !== 0) {
+    postsToAdd = posts.filter((post) => !postsByRss.some((elem) => elem.title === post.title));
+  }
+  const postsToState = postsToAdd.map((post) => ({
     id: uniqueId(),
     ...post,
     rssId,
   }));
 
-  return [...postsToAdd, ...postsList];
+  postsList.push(...postsToState);
 };
