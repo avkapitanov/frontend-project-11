@@ -1,4 +1,5 @@
 import { string } from 'yup';
+import { RSS_FORM_STATE } from './const';
 
 export default (rssLink, state) => {
   const rssSchema = string()
@@ -8,11 +9,11 @@ export default (rssLink, state) => {
     .test((rssURL) => {
       const { rss } = state;
 
-      if (!rss.includes(rssURL)) {
+      if (!rss.map(({ link }) => link).includes(rssURL)) {
         return true;
       }
 
-      throw new Error('alreadyExists');
+      throw new Error(RSS_FORM_STATE.URL_ALREADY_EXISTS);
     });
 
   return rssSchema.isValid(rssLink);

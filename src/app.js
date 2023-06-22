@@ -1,11 +1,12 @@
 import onChange from 'on-change';
 import i18next from 'i18next';
+import { setLocale } from 'yup';
 import resources from './locales/index.js';
-import validationRss from './validationRss';
+import validateRss from './validationRss';
 import loadRssResource from './api';
 import parseData from './parser';
 import { savePosts, saveRss } from './state';
-import { CHECK_RSS_RESOURCES_TIME, DEFAULT_APP_LANGUAGE } from './const';
+import { CHECK_RSS_RESOURCES_TIME, DEFAULT_APP_LANGUAGE, RSS_FORM_STATE } from './const';
 import render from './view';
 
 const checkRssResources = (state) => {
@@ -30,16 +31,23 @@ const runApp = (initialState) => {
     debug: false,
     resources,
   }).then(() => {
+    setLocale({
+      string: {
+        url: RSS_FORM_STATE.INVALID_URL,
+        required: RSS_FORM_STATE.EMPTY_URL,
+      },
+    });
     const elements = {
       rssAddForm: document.querySelector('.rss-form'),
       rssFormInput: document.querySelector('#url-input'),
       detailPostModal: document.querySelector('#post-detail-modal'),
       addBtn: document.querySelector('.rss-form__add-btn'),
       addBtnSpinner: document.querySelector('.rss-form__add-btn-spinner'),
-      rssListWrapper: document.querySelector('.rss-list-wrapper'),
       rssList: document.querySelector('.rss-list'),
-      postsListWrapper: document.querySelector('.posts-list-wrapper'),
+      rssBlockTitle: document.querySelector('.rss-list-wrapper .card-title'),
       postList: document.querySelector('.posts-list'),
+      postBlockTitle: document.querySelector('.posts-list-wrapper .card-title'),
+      feedback: document.querySelector('.feedback'),
     };
 
     const state = { ...initialState };
@@ -51,12 +59,12 @@ const runApp = (initialState) => {
     elements.rssAddForm.addEventListener('submit', (evt) => {
       evt.preventDefault();
       const rssUrl = new FormData(elements.rssAddForm).get('url');
-      validationRss(rssUrl, watchedState)
+      validateRss(rssUrl, watchedState)
         .then((isValid) => {
           if (!isValid) {
-            throw new Error('rssLoadMessages.invalidRSS');
+            throw new Error(RSS_FORM_STATE.INVALID_URL);
           }
-          watchedState.rssFormState = 'start';
+          watchedState.rssFormState = RSS_FORM_STATE.START;
           return loadRssResource(rssUrl);
         })
         .then((data) => {
@@ -64,11 +72,17 @@ const runApp = (initialState) => {
           const newRssItem = saveRss(watchedState.rss, rssFeed, rssUrl);
           const { id: rssId } = newRssItem;
           savePosts(watchedState.posts, posts, rssId);
-          watchedState.rssFormState = 'loaded';
+          watchedState.rssFormState = RSS_FORM_STATE.LOADED;
         })
         .catch((error) => {
-          watchedState.rssFormState = error.message;
-          watchedState.rssFormState = 'invalidUrl';
+          if (error.isAxiosError) {
+            watchedState.rssFormState = RSS_FORM_STATE.NETWORK_ERR;
+          } else {
+            watchedState.rssFormState = error.message;
+          }
+        })
+        .finally(() => {
+          watchedState.rssFormState = RSS_FORM_STATE.WAIT;
         });
 
       checkRssResources(watchedState);

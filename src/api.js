@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PROXI_URL, REQUEST_TIMEOUT } from './const';
+import { PROXI_URL, REQUEST_TIMEOUT, RSS_FORM_STATE } from './const';
 
 const getProxyUrl = (path) => {
   const url = new URL(PROXI_URL);
@@ -13,7 +13,7 @@ const getProxyUrl = (path) => {
 const loadRssResource = (path) => axios.get(getProxyUrl(path), {
   timeout: REQUEST_TIMEOUT,
 })
-  .catch(() => { throw new Error('rssLoadMessages.networkError'); })
+  .catch(() => { throw new Error(RSS_FORM_STATE.NETWORK_ERR); })
   .then(({ data }) => data.contents);
 
 export default loadRssResource;

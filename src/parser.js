@@ -1,3 +1,5 @@
+import { RSS_FORM_STATE } from './const';
+
 const parseRssInfo = (parsedDoc) => {
   const rssTitle = parsedDoc.querySelector('channel > title').textContent;
   const rssDescription = parsedDoc.querySelector('channel > description').textContent;
@@ -29,7 +31,7 @@ const parseData = (data) => {
   const parsedDoc = parser.parseFromString(data, 'application/xml');
   const errorNode = parsedDoc.querySelector('parsererror');
   if (errorNode) {
-    throw new Error('rssFormStatuses.invalidRSS');
+    throw new Error(RSS_FORM_STATE.INVALID_RSS);
   }
 
   return {

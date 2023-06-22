@@ -1,13 +1,13 @@
+import { RSS_FORM_STATE } from './const';
+
 const renderFeedsList = (state, elements) => {
   const { rss } = state;
-  const { rssList, rssListWrapper } = elements;
+  const { rssList } = elements;
   if (rss.length === 0) {
-    rssListWrapper.classList.add('d-none');
     return;
   }
 
   rssList.innerHTML = '';
-  rssListWrapper.classList.remove('d-none');
   const list = document.createElement('ul');
   list.classList.add('list-group', 'border-0', 'rounded-0');
   rss.forEach((rssItem) => {
@@ -52,15 +52,13 @@ const createPostDetailBtn = ({ id }, i18n) => {
 
 const renderPosts = (state, elements, i18n) => {
   const { posts } = state;
-  const { postsListWrapper, postList } = elements;
+  const { postList } = elements;
 
   if (posts.length === 0) {
-    postsListWrapper.classList.add('d-none');
     return;
   }
 
   postList.innerHTML = '';
-  postsListWrapper.classList.remove('d-none');
   const list = document.createElement('ul');
   list.classList.add('list-group', 'border-0', 'rounded-0');
   posts.forEach((post) => {
@@ -78,8 +76,8 @@ const renderPosts = (state, elements, i18n) => {
   postList.append(list);
 };
 
-const renderRssFormStatusMessage = (text, type) => {
-  const feedback = document.querySelector('.feedback');
+const renderRssFormStatusMessage = (elements, text, type = 'success') => {
+  const { feedback } = elements;
   const removeCls = type === 'success' ? 'danger' : 'success';
   feedback.innerHTML = text;
 
@@ -89,41 +87,60 @@ const renderRssFormStatusMessage = (text, type) => {
 
 const render = (path, value, watchedState, i18n, elements) => {
   switch (path) {
-    case 'rss':
+    case 'rss': {
+      const { rssBlockTitle } = elements;
+      rssBlockTitle.textContent = i18n.t('rssList.blockTitle');
       renderFeedsList(watchedState, elements);
       break;
-    case 'posts':
+    }
+    case 'posts': {
+      const { postBlockTitle } = elements;
+      postBlockTitle.textContent = i18n.t('postsList.blockTitle');
       renderPosts(watchedState, elements, i18n);
       break;
+    }
     case 'rssFormState': {
-      const type = value === 'loaded' ? 'success' : 'danger';
-      renderRssFormStatusMessage(i18n.t(`rssFormStatuses.${value}`), type);
-      if (value === 'start') {
-        elements.addBtnSpinner.classList.remove('visually-hidden');
-      }
-      if (value === 'loaded') {
-        elements.rssFormInput.classList.remove('is-invalid');
-        elements.rssAddForm.reset();
-        elements.rssFormInput.focus();
-        elements.addBtnSpinner.classList.add('visually-hidden');
-      }
-      if (value === 'error') {
-        elements.rssFormInput.classList.add('is-invalid');
-        elements.addBtnSpinner.classList.add('visually-hidden');
+      switch (value) {
+        case RSS_FORM_STATE.START:
+          elements.addBtnSpinner.classList.remove('visually-hidden');
+          renderRssFormStatusMessage(elements, '');
+          break;
+        case RSS_FORM_STATE.LOADED:
+          elements.rssFormInput.classList.remove('is-invalid');
+          elements.rssAddForm.reset();
+          elements.rssFormInput.focus();
+          elements.addBtnSpinner.classList.add('visually-hidden');
+          renderRssFormStatusMessage(elements, i18n.t(`rssLoadMessages.${value}`), 'success');
+          break;
+        case RSS_FORM_STATE.INVALID_RSS:
+        case RSS_FORM_STATE.INVALID_URL:
+        case RSS_FORM_STATE.URL_ALREADY_EXISTS:
+        case RSS_FORM_STATE.EMPTY_URL:
+        case RSS_FORM_STATE.NETWORK_ERR:
+          elements.rssFormInput.classList.add('is-invalid');
+          elements.addBtnSpinner.classList.add('visually-hidden');
+          renderRssFormStatusMessage(elements, i18n.t(`rssLoadMessages.${value}`), 'danger');
+          break;
+        case RSS_FORM_STATE.WAIT:
+          elements.addBtnSpinner.classList.add('visually-hidden');
+          break;
+        default:
+          break;
       }
       break;
     }
     case 'watchedPost':
       if (value !== null) {
         const { title, description, link } = value;
+        const { detailPostModal } = elements;
 
-        const modalTitle = elements.detailPostModal.querySelector('.modal-title');
+        const modalTitle = detailPostModal.querySelector('.modal-title');
         modalTitle.textContent = title;
 
-        const modalDescription = elements.detailPostModal.querySelector('.modal-body');
-        modalDescription.textContent = description;
+        const modalDescription = detailPostModal.querySelector('.modal-body');
+        modalDescription.innerHTML = description;
 
-        const modalDetailLink = elements.detailPostModal.querySelector('.btn-detail-link');
+        const modalDetailLink = detailPostModal.querySelector('.btn-detail-link');
         modalDetailLink.setAttribute('href', link);
       }
       break;
