@@ -1,22 +1,16 @@
-const parseData = (data) => {
-  const parser = new DOMParser();
-
-  const parsedDoc = parser.parseFromString(data, 'application/xml');
-  const errorNode = parsedDoc.querySelector('parsererror');
-  if (errorNode) {
-    throw new Error('rssFormStatuses.invalidRSS');
-  }
-
+const parseRssInfo = (parsedDoc) => {
   const rssTitle = parsedDoc.querySelector('channel > title').textContent;
   const rssDescription = parsedDoc.querySelector('channel > description').textContent;
 
-  const rssFeed = {
+  return {
     title: rssTitle,
     description: rssDescription,
   };
+};
 
+const parseItems = (parsedDoc) => {
   const items = parsedDoc.querySelectorAll('item');
-  const posts = Array.from(items).map((item) => {
+  return Array.from(items).map((item) => {
     const itemTitle = item.querySelector('title').textContent;
     const itemDescription = item.querySelector('description').textContent;
     const itemLink = item.querySelector('link').textContent;
@@ -27,10 +21,20 @@ const parseData = (data) => {
       link: itemLink,
     };
   });
+};
+
+const parseData = (data) => {
+  const parser = new DOMParser();
+
+  const parsedDoc = parser.parseFromString(data, 'application/xml');
+  const errorNode = parsedDoc.querySelector('parsererror');
+  if (errorNode) {
+    throw new Error('rssFormStatuses.invalidRSS');
+  }
 
   return {
-    rssFeed,
-    posts,
+    rssFeed: parseRssInfo(parsedDoc),
+    posts: parseItems(parsedDoc),
   };
 };
 

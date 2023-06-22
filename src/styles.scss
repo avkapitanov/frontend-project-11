@@ -3,3 +3,13 @@
 .text-muted {
   color: #6c757d !important;
 }
+
+.rss-form__add-btn {
+  position: relative;
+}
+
+.rss-form__add-btn-spinner {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}

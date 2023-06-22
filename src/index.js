@@ -1,6 +1,6 @@
 import './styles.scss';
 import 'bootstrap';
-import runApp from './view';
+import runApp from './app';
 import getInitialState from './state';
 
 const initialState = getInitialState();

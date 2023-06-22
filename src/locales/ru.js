@@ -1,6 +1,6 @@
 export default {
   translation: {
-    rssFormStatuses: {
+    rssLoadMessages: {
       loaded: 'RSS успешно загружен',
       alreadyExists: 'RSS уже существует',
       invalidUrl: 'Ссылка должна быть валидным URL',

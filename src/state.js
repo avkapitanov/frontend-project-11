@@ -3,7 +3,7 @@ import uniqueId from 'lodash.uniqueid';
 export default () => ({
   rss: [],
   posts: [],
-  rssFormStatus: '',
+  rssFormState: '',
   watchedPost: null,
   uiState: {
     readPosts: [],
