@@ -125,6 +125,7 @@ const render = (path, value, watchedState, i18n, elements) => {
       switch (value) {
         case RSS_FORM_STATE.START:
           elements.addBtnSpinner.classList.remove('visually-hidden');
+          elements.addBtn.setAttribute('disabled', 'disabled');
           renderRssFormStatusMessage(elements, '');
           break;
         case RSS_FORM_STATE.LOADED:
@@ -145,6 +146,7 @@ const render = (path, value, watchedState, i18n, elements) => {
           break;
         case RSS_FORM_STATE.WAIT:
           elements.addBtnSpinner.classList.add('visually-hidden');
+          elements.addBtn.removeAttribute('disabled');
           break;
         default:
           break;
