@@ -45,6 +45,15 @@ const getUIElements = () => ({
   rssFormHelpText: document.querySelector('.rss-form__help-text'),
 });
 
+const setCustomYupLocale = () => {
+  setLocale({
+    string: {
+      url: RSS_FORM_STATE.INVALID_URL,
+      required: RSS_FORM_STATE.EMPTY_URL,
+    },
+  });
+};
+
 const runApp = (initialState) => {
   const i18n = i18next.createInstance();
   i18n.init({
@@ -52,12 +61,7 @@ const runApp = (initialState) => {
     debug: false,
     resources,
   }).then(() => {
-    setLocale({
-      string: {
-        url: RSS_FORM_STATE.INVALID_URL,
-        required: RSS_FORM_STATE.EMPTY_URL,
-      },
-    });
+    setCustomYupLocale();
     const elements = getUIElements();
     fillAppTexts(elements, i18n);
 

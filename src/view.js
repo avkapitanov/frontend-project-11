@@ -178,20 +178,26 @@ const processChangeLanguage = (value, elements, i18n) => {
   fillAppTexts(elements, i18n);
 };
 
+const renderRssBlock = (watchedState, elements, i18n) => {
+  const { rssBlockTitle } = elements;
+  rssBlockTitle.textContent = i18n.t('rssList.blockTitle');
+  renderFeedsList(watchedState, elements);
+};
+
+const renderPostsBlock = (watchedState, elements, i18n) => {
+  const { postBlockTitle } = elements;
+  postBlockTitle.textContent = i18n.t('postsList.blockTitle');
+  renderPosts(watchedState, elements, i18n);
+};
+
 const render = (path, value, watchedState, i18n, elements) => {
   switch (path) {
-    case 'rss': {
-      const { rssBlockTitle } = elements;
-      rssBlockTitle.textContent = i18n.t('rssList.blockTitle');
-      renderFeedsList(watchedState, elements);
+    case 'rss':
+      renderRssBlock(watchedState, elements, i18n);
       break;
-    }
-    case 'posts': {
-      const { postBlockTitle } = elements;
-      postBlockTitle.textContent = i18n.t('postsList.blockTitle');
-      renderPosts(watchedState, elements, i18n);
+    case 'posts':
+      renderPostsBlock(watchedState, elements, i18n);
       break;
-    }
     case 'rssFormState':
       processRssFormState(value, elements, i18n);
       break;
