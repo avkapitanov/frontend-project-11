@@ -121,19 +121,27 @@ const showModal = (value, elements) => {
   modalDetailLink.setAttribute('href', link);
 };
 
+const showStartState = (elements) => {
+  elements.addBtnSpinner.classList.remove('visually-hidden');
+  elements.addBtn.setAttribute('disabled', 'disabled');
+  renderRssFormStatusMessage(elements, '');
+};
+
+const showLoadedState = (value, elements, i18n) => {
+  elements.rssFormInput.classList.remove('is-invalid');
+  elements.rssAddForm.reset();
+  elements.rssFormInput.focus();
+  elements.addBtnSpinner.classList.add('visually-hidden');
+  renderRssFormStatusMessage(elements, i18n.t(`rssLoadMessages.${value}`), 'success');
+};
+
 const processRssFormState = (value, elements, i18n) => {
   switch (value) {
     case RSS_FORM_STATE.START:
-      elements.addBtnSpinner.classList.remove('visually-hidden');
-      elements.addBtn.setAttribute('disabled', 'disabled');
-      renderRssFormStatusMessage(elements, '');
+      showStartState(elements);
       break;
     case RSS_FORM_STATE.LOADED:
-      elements.rssFormInput.classList.remove('is-invalid');
-      elements.rssAddForm.reset();
-      elements.rssFormInput.focus();
-      elements.addBtnSpinner.classList.add('visually-hidden');
-      renderRssFormStatusMessage(elements, i18n.t(`rssLoadMessages.${value}`), 'success');
+      showLoadedState(value, elements, i18n);
       break;
     case RSS_FORM_STATE.INVALID_RSS:
     case RSS_FORM_STATE.INVALID_URL:
@@ -151,6 +159,12 @@ const processRssFormState = (value, elements, i18n) => {
     default:
       throw new Error(`Unknown form state: ${value}`);
   }
+};
+
+const markReadPost = (postId) => {
+  const postLink = document.querySelector(`[data-post-id="${postId}"]`);
+  postLink.classList.remove('fw-bold');
+  postLink.classList.add('fw-normal', 'link-secondary');
 };
 
 const processChangeLanguage = (value, elements, i18n) => {
@@ -186,13 +200,9 @@ const render = (path, value, watchedState, i18n, elements) => {
         showModal(value, elements);
       }
       break;
-    case 'uiState.readPosts': {
-      const postId = watchedState.uiState.readPosts.at(-1);
-      const postLink = document.querySelector(`[data-post-id="${postId}"]`);
-      postLink.classList.remove('fw-bold');
-      postLink.classList.add('fw-normal', 'link-secondary');
+    case 'uiState.readPosts':
+      markReadPost(watchedState.uiState.readPosts.at(-1));
       break;
-    }
     case 'currentLanguage':
       processChangeLanguage(value, elements, i18n);
       break;
