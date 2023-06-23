@@ -8,6 +8,15 @@ export default {
       emptyUrl: 'Не должно быть пустым',
       networkError: 'Ошибка сети',
     },
+    mainUI: {
+      appTitle: 'RSS агрегатор',
+      appDescription: 'Начните читать RSS сегодня! Это легко, это красиво.',
+      rssFormLabel: 'Ссылка RSS',
+      viewFullModal: 'Читать полностью',
+      btnCloseModal: 'Закрыть',
+      rssFormHelpText: 'Пример: https://ru.hexlet.io/lessons.rss',
+      addBtnText: 'Добавить',
+    },
     postsList: {
       blockTitle: 'Посты',
       view: 'Просмотр',

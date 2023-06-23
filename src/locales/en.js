@@ -8,6 +8,15 @@ export default {
       emptyUrl: 'Must not be empty',
       networkError: 'Network error',
     },
+    mainUI: {
+      appTitle: 'RSS aggregator',
+      appDescription: 'Start reading RSS today! It\'s easy, it\'s beautiful.',
+      rssFormLabel: 'RSS Link',
+      viewFullModal: 'View details',
+      btnCloseModal: 'Close',
+      rssFormHelpText: 'Example: https://rt.com/rss/news',
+      addBtnText: 'Add',
+    },
     postsList: {
       blockTitle: 'Posts',
       view: 'View details',

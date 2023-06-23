@@ -7,7 +7,7 @@ import loadRssResource from './api';
 import parseData from './parser';
 import { savePosts, saveRss } from './state';
 import { CHECK_RSS_RESOURCES_TIME, DEFAULT_APP_LANGUAGE, RSS_FORM_STATE } from './const';
-import render from './view';
+import render, { fillAppTexts } from './view';
 
 const checkRssResources = (state) => {
   setTimeout(() => {
@@ -41,14 +41,24 @@ const runApp = (initialState) => {
       rssAddForm: document.querySelector('.rss-form'),
       rssFormInput: document.querySelector('#url-input'),
       detailPostModal: document.querySelector('#post-detail-modal'),
+      viewFullModal: document.querySelector('.btn-detail-link'),
+      btnCloseModal: document.querySelector('.btn-close-footer'),
       addBtn: document.querySelector('.rss-form__add-btn'),
+      addBtnText: document.querySelector('.rss-form__add-btn-text'),
       addBtnSpinner: document.querySelector('.rss-form__add-btn-spinner'),
       rssList: document.querySelector('.rss-list'),
       rssBlockTitle: document.querySelector('.rss-list-wrapper .card-title'),
       postList: document.querySelector('.posts-list'),
       postBlockTitle: document.querySelector('.posts-list-wrapper .card-title'),
       feedback: document.querySelector('.feedback'),
+      languageBtn: document.querySelectorAll('.language-btn'),
+      appTitle: document.querySelector('.app-title'),
+      appDescription: document.querySelector('.app-description'),
+      rssFormLabel: document.querySelector('.rss-form__label'),
+      rssFormHelpText: document.querySelector('.rss-form__help-text'),
     };
+
+    fillAppTexts(elements, i18n);
 
     const state = { ...initialState };
     const watchedState = onChange(
@@ -73,6 +83,7 @@ const runApp = (initialState) => {
           const { id: rssId } = newRssItem;
           savePosts(watchedState.posts, posts, rssId);
           watchedState.rssFormState = RSS_FORM_STATE.LOADED;
+          checkRssResources(watchedState);
         })
         .catch((error) => {
           if (error.isAxiosError) {
@@ -84,8 +95,6 @@ const runApp = (initialState) => {
         .finally(() => {
           watchedState.rssFormState = RSS_FORM_STATE.WAIT;
         });
-
-      checkRssResources(watchedState);
     });
 
     elements.detailPostModal.addEventListener('show.bs.modal', (evt) => {
@@ -99,6 +108,17 @@ const runApp = (initialState) => {
 
     elements.detailPostModal.addEventListener('shown.bs.modal', () => {
       watchedState.watchedPost = null;
+    });
+
+    [...elements.languageBtn].forEach((btn) => {
+      btn.addEventListener('click', (evt) => {
+        const { target } = evt;
+        i18n
+          .changeLanguage(target.dataset.lang)
+          .then(() => {
+            watchedState.currentLanguage = target.dataset.lang;
+          });
+      });
     });
   });
 };

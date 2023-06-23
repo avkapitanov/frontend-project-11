@@ -85,6 +85,28 @@ const renderRssFormStatusMessage = (elements, text, type = 'success') => {
   feedback.classList.remove(`text-${removeCls}`);
 };
 
+export const fillAppTexts = (elements, i18n) => {
+  const {
+    appTitle,
+    appDescription,
+    rssFormLabel,
+    rssFormInput,
+    viewFullModal,
+    btnCloseModal,
+    rssFormHelpText,
+    addBtnText,
+  } = elements;
+
+  appTitle.textContent = i18n.t('mainUI.appTitle');
+  appDescription.textContent = i18n.t('mainUI.appDescription');
+  rssFormLabel.textContent = i18n.t('mainUI.rssFormLabel');
+  rssFormInput.placeholder = i18n.t('mainUI.rssFormLabel');
+  viewFullModal.textContent = i18n.t('mainUI.viewFullModal');
+  btnCloseModal.textContent = i18n.t('mainUI.btnCloseModal');
+  rssFormHelpText.textContent = i18n.t('mainUI.rssFormHelpText');
+  addBtnText.textContent = i18n.t('mainUI.addBtnText');
+};
+
 const render = (path, value, watchedState, i18n, elements) => {
   switch (path) {
     case 'rss': {
@@ -151,6 +173,16 @@ const render = (path, value, watchedState, i18n, elements) => {
       postLink.classList.add('fw-normal', 'link-secondary');
       break;
     }
+    case 'currentLanguage':
+      [...elements.languageBtn].forEach((btn) => {
+        if (btn.dataset.lang === value) {
+          btn.classList.replace('btn-outline-light', 'btn-primary');
+        } else {
+          btn.classList.replace('btn-primary', 'btn-outline-light');
+        }
+      });
+      fillAppTexts(elements, i18n);
+      break;
     default:
       break;
   }
