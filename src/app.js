@@ -24,6 +24,27 @@ const checkRssResources = (state) => {
   }, CHECK_RSS_RESOURCES_TIME);
 };
 
+const getUIElements = () => ({
+  rssAddForm: document.querySelector('.rss-form'),
+  rssFormInput: document.querySelector('#url-input'),
+  detailPostModal: document.querySelector('#post-detail-modal'),
+  viewFullModal: document.querySelector('.btn-detail-link'),
+  btnCloseModal: document.querySelector('.btn-close-footer'),
+  addBtn: document.querySelector('.rss-form__add-btn'),
+  addBtnText: document.querySelector('.rss-form__add-btn-text'),
+  addBtnSpinner: document.querySelector('.rss-form__add-btn-spinner'),
+  rssList: document.querySelector('.rss-list'),
+  rssBlockTitle: document.querySelector('.rss-list-wrapper .card-title'),
+  postList: document.querySelector('.posts-list'),
+  postBlockTitle: document.querySelector('.posts-list-wrapper .card-title'),
+  feedback: document.querySelector('.feedback'),
+  languageBtn: document.querySelectorAll('.language-btn'),
+  appTitle: document.querySelector('.app-title'),
+  appDescription: document.querySelector('.app-description'),
+  rssFormLabel: document.querySelector('.rss-form__label'),
+  rssFormHelpText: document.querySelector('.rss-form__help-text'),
+});
+
 const runApp = (initialState) => {
   const i18n = i18next.createInstance();
   i18n.init({
@@ -37,27 +58,7 @@ const runApp = (initialState) => {
         required: RSS_FORM_STATE.EMPTY_URL,
       },
     });
-    const elements = {
-      rssAddForm: document.querySelector('.rss-form'),
-      rssFormInput: document.querySelector('#url-input'),
-      detailPostModal: document.querySelector('#post-detail-modal'),
-      viewFullModal: document.querySelector('.btn-detail-link'),
-      btnCloseModal: document.querySelector('.btn-close-footer'),
-      addBtn: document.querySelector('.rss-form__add-btn'),
-      addBtnText: document.querySelector('.rss-form__add-btn-text'),
-      addBtnSpinner: document.querySelector('.rss-form__add-btn-spinner'),
-      rssList: document.querySelector('.rss-list'),
-      rssBlockTitle: document.querySelector('.rss-list-wrapper .card-title'),
-      postList: document.querySelector('.posts-list'),
-      postBlockTitle: document.querySelector('.posts-list-wrapper .card-title'),
-      feedback: document.querySelector('.feedback'),
-      languageBtn: document.querySelectorAll('.language-btn'),
-      appTitle: document.querySelector('.app-title'),
-      appDescription: document.querySelector('.app-description'),
-      rssFormLabel: document.querySelector('.rss-form__label'),
-      rssFormHelpText: document.querySelector('.rss-form__help-text'),
-    };
-
+    const elements = getUIElements();
     fillAppTexts(elements, i18n);
 
     const state = { ...initialState };

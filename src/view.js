@@ -107,6 +107,63 @@ export const fillAppTexts = (elements, i18n) => {
   addBtnText.textContent = i18n.t('mainUI.addBtnText');
 };
 
+const showModal = (value, elements) => {
+  const { title, description, link } = value;
+  const { detailPostModal } = elements;
+
+  const modalTitle = detailPostModal.querySelector('.modal-title');
+  modalTitle.textContent = title;
+
+  const modalDescription = detailPostModal.querySelector('.modal-body');
+  modalDescription.innerHTML = description;
+
+  const modalDetailLink = detailPostModal.querySelector('.btn-detail-link');
+  modalDetailLink.setAttribute('href', link);
+};
+
+const processRssFormState = (value, elements, i18n) => {
+  switch (value) {
+    case RSS_FORM_STATE.START:
+      elements.addBtnSpinner.classList.remove('visually-hidden');
+      elements.addBtn.setAttribute('disabled', 'disabled');
+      renderRssFormStatusMessage(elements, '');
+      break;
+    case RSS_FORM_STATE.LOADED:
+      elements.rssFormInput.classList.remove('is-invalid');
+      elements.rssAddForm.reset();
+      elements.rssFormInput.focus();
+      elements.addBtnSpinner.classList.add('visually-hidden');
+      renderRssFormStatusMessage(elements, i18n.t(`rssLoadMessages.${value}`), 'success');
+      break;
+    case RSS_FORM_STATE.INVALID_RSS:
+    case RSS_FORM_STATE.INVALID_URL:
+    case RSS_FORM_STATE.URL_ALREADY_EXISTS:
+    case RSS_FORM_STATE.EMPTY_URL:
+    case RSS_FORM_STATE.NETWORK_ERR:
+      elements.rssFormInput.classList.add('is-invalid');
+      elements.addBtnSpinner.classList.add('visually-hidden');
+      renderRssFormStatusMessage(elements, i18n.t(`rssLoadMessages.${value}`), 'danger');
+      break;
+    case RSS_FORM_STATE.WAIT:
+      elements.addBtnSpinner.classList.add('visually-hidden');
+      elements.addBtn.removeAttribute('disabled');
+      break;
+    default:
+      throw new Error(`Unknown form state: ${value}`);
+  }
+};
+
+const processChangeLanguage = (value, elements, i18n) => {
+  [...elements.languageBtn].forEach((btn) => {
+    if (btn.dataset.lang === value) {
+      btn.classList.replace('btn-outline-light', 'btn-primary');
+    } else {
+      btn.classList.replace('btn-primary', 'btn-outline-light');
+    }
+  });
+  fillAppTexts(elements, i18n);
+};
+
 const render = (path, value, watchedState, i18n, elements) => {
   switch (path) {
     case 'rss': {
@@ -121,51 +178,12 @@ const render = (path, value, watchedState, i18n, elements) => {
       renderPosts(watchedState, elements, i18n);
       break;
     }
-    case 'rssFormState': {
-      switch (value) {
-        case RSS_FORM_STATE.START:
-          elements.addBtnSpinner.classList.remove('visually-hidden');
-          elements.addBtn.setAttribute('disabled', 'disabled');
-          renderRssFormStatusMessage(elements, '');
-          break;
-        case RSS_FORM_STATE.LOADED:
-          elements.rssFormInput.classList.remove('is-invalid');
-          elements.rssAddForm.reset();
-          elements.rssFormInput.focus();
-          elements.addBtnSpinner.classList.add('visually-hidden');
-          renderRssFormStatusMessage(elements, i18n.t(`rssLoadMessages.${value}`), 'success');
-          break;
-        case RSS_FORM_STATE.INVALID_RSS:
-        case RSS_FORM_STATE.INVALID_URL:
-        case RSS_FORM_STATE.URL_ALREADY_EXISTS:
-        case RSS_FORM_STATE.EMPTY_URL:
-        case RSS_FORM_STATE.NETWORK_ERR:
-          elements.rssFormInput.classList.add('is-invalid');
-          elements.addBtnSpinner.classList.add('visually-hidden');
-          renderRssFormStatusMessage(elements, i18n.t(`rssLoadMessages.${value}`), 'danger');
-          break;
-        case RSS_FORM_STATE.WAIT:
-          elements.addBtnSpinner.classList.add('visually-hidden');
-          elements.addBtn.removeAttribute('disabled');
-          break;
-        default:
-          break;
-      }
+    case 'rssFormState':
+      processRssFormState(value, elements, i18n);
       break;
-    }
     case 'watchedPost':
       if (value !== null) {
-        const { title, description, link } = value;
-        const { detailPostModal } = elements;
-
-        const modalTitle = detailPostModal.querySelector('.modal-title');
-        modalTitle.textContent = title;
-
-        const modalDescription = detailPostModal.querySelector('.modal-body');
-        modalDescription.innerHTML = description;
-
-        const modalDetailLink = detailPostModal.querySelector('.btn-detail-link');
-        modalDetailLink.setAttribute('href', link);
+        showModal(value, elements);
       }
       break;
     case 'uiState.readPosts': {
@@ -176,17 +194,10 @@ const render = (path, value, watchedState, i18n, elements) => {
       break;
     }
     case 'currentLanguage':
-      [...elements.languageBtn].forEach((btn) => {
-        if (btn.dataset.lang === value) {
-          btn.classList.replace('btn-outline-light', 'btn-primary');
-        } else {
-          btn.classList.replace('btn-primary', 'btn-outline-light');
-        }
-      });
-      fillAppTexts(elements, i18n);
+      processChangeLanguage(value, elements, i18n);
       break;
     default:
-      break;
+      throw new Error(`Unknown app state: ${value}`);
   }
 };
 
