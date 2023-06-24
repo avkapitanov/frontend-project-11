@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>RSS Aggregator</title>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 <main class="flex-grow-1">
     <section class="container-fluid bg-dark p-5">
         <div class="container-fluid text-end">
@@ -28,11 +28,13 @@
                                                               aria-label="url" class="form-control w-100"
                                                               placeholder="" autocomplete="off"
                                                               value=""> <label class="rss-form__label"
-                                    for="url-input"></label></div>
+                                                                               for="url-input"></label></div>
                         </div>
                         <div class="col-auto">
-                            <button type="submit" aria-label="add" class="h-100 btn btn-lg btn-primary px-sm-5 rss-form__add-btn">
-                                <span class="spinner-border spinner-border-sm visually-hidden rss-form__add-btn-spinner" role="status" aria-hidden="true"></span>
+                            <button type="submit" aria-label="add"
+                                    class="h-100 btn btn-lg btn-primary px-sm-5 rss-form__add-btn">
+                                <span class="spinner-border spinner-border-sm visually-hidden rss-form__add-btn-spinner"
+                                      role="status" aria-hidden="true"></span>
                                 <span class="rss-form__add-btn-text"></span>
                             </button>
                         </div>
@@ -76,5 +78,13 @@
         </div>
     </div>
 </main>
+<footer class="footer border-top py-3 mt-5 bg-light copyright">
+    <div class="container-xl">
+        <div class="text-center">
+            <span class="copyright__text"></span>
+            <a class="copyright__author" href="https://github.com/avkapitanov/frontend-project-11" target="_blank"></a>
+        </div>
+    </div>
+</footer>
 </body>
 </html>

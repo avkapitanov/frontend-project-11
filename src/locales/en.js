@@ -16,6 +16,8 @@ export default {
       btnCloseModal: 'Close',
       rssFormHelpText: 'Example: https://rt.com/rss/news',
       addBtnText: 'Add',
+      createdBy: 'Created by',
+      authorName: 'Kapitanov Artem',
     },
     postsList: {
       blockTitle: 'Posts',

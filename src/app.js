@@ -44,7 +44,8 @@ const getUIElements = () => ({
   appDescription: document.querySelector('.app-description'),
   rssFormLabel: document.querySelector('.rss-form__label'),
   rssFormHelpText: document.querySelector('.rss-form__help-text'),
-  errorToastContainer: document.querySelector('.toast-container'),
+  copyrightText: document.querySelector('.copyright__text'),
+  copyrightAuthor: document.querySelector('.copyright__author'),
 });
 
 const setCustomYupLocale = () => {

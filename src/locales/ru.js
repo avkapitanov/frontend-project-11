@@ -16,6 +16,8 @@ export default {
       btnCloseModal: 'Закрыть',
       rssFormHelpText: 'Пример: https://ru.hexlet.io/lessons.rss',
       addBtnText: 'Добавить',
+      createdBy: 'Разработчик',
+      authorName: 'Капитанов Артём',
     },
     postsList: {
       blockTitle: 'Посты',

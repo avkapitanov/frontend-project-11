@@ -95,6 +95,8 @@ export const fillAppTexts = (elements, i18n) => {
     btnCloseModal,
     rssFormHelpText,
     addBtnText,
+    copyrightText,
+    copyrightAuthor,
   } = elements;
 
   appTitle.textContent = i18n.t('mainUI.appTitle');
@@ -105,6 +107,8 @@ export const fillAppTexts = (elements, i18n) => {
   btnCloseModal.textContent = i18n.t('mainUI.btnCloseModal');
   rssFormHelpText.textContent = i18n.t('mainUI.rssFormHelpText');
   addBtnText.textContent = i18n.t('mainUI.addBtnText');
+  copyrightText.textContent = i18n.t('mainUI.createdBy');
+  copyrightAuthor.textContent = i18n.t('mainUI.authorName');
 };
 
 const showModal = (value, elements) => {
