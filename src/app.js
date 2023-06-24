@@ -20,7 +20,8 @@ const checkRssResources = (state) => {
           savePosts(state.posts, posts, rssId);
         });
         checkRssResources(state);
-      });
+      })
+      .catch((err) => ({ error: err }));
   }, CHECK_RSS_RESOURCES_TIME);
 };
 
@@ -43,6 +44,7 @@ const getUIElements = () => ({
   appDescription: document.querySelector('.app-description'),
   rssFormLabel: document.querySelector('.rss-form__label'),
   rssFormHelpText: document.querySelector('.rss-form__help-text'),
+  errorToastContainer: document.querySelector('.toast-container'),
 });
 
 const setCustomYupLocale = () => {
