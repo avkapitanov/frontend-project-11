@@ -215,6 +215,8 @@ const render = (path, value, watchedState, i18n, elements) => {
       break;
     case 'currentLanguage':
       processChangeLanguage(value, elements, i18n);
+      renderPostsBlock(watchedState, elements, i18n);
+      renderRssBlock(watchedState, elements, i18n);
       break;
     default:
       throw new Error(`Unknown app state: ${value}`);

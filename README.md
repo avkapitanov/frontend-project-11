@@ -7,5 +7,15 @@
 ### Project description
 RSS Aggregator is a service for aggregating RSS feeds, with which it is convenient to read a variety of sources, such as blogs. It allows you to add an unlimited number of RSS feeds, updates them itself and adds new entries to the general feed.
 
+### Requirements:
+- Node.js version >= 16.14
+
+### Install
+```bash
+make install
+make build
+```
+This will generate a file `dist/index.html`. Open it in browser. 
+
 ### Project link
 https://frontend-project-11-red-xi.vercel.app/

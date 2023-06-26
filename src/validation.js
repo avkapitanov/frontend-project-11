@@ -1,14 +1,12 @@
 import { string } from 'yup';
 import { RSS_FORM_STATE } from './const';
 
-export default (rssLink, state) => {
+export default (rssLink, rss) => {
   const rssSchema = string()
     .trim()
     .required()
     .url()
     .test((rssURL) => {
-      const { rss } = state;
-
       if (!rss.map(({ link }) => link).includes(rssURL)) {
         return true;
       }

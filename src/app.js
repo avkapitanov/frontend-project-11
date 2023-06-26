@@ -2,7 +2,7 @@ import onChange from 'on-change';
 import i18next from 'i18next';
 import { setLocale } from 'yup';
 import resources from './locales/index.js';
-import validateRss from './validationRss';
+import validateRss from './validation';
 import loadRssResource from './api';
 import parseData from './parser';
 import { savePosts, saveRss } from './state';
@@ -21,7 +21,7 @@ const checkRssResources = (state) => {
         });
         checkRssResources(state);
       })
-      .catch((err) => ({ error: err }));
+      .catch((err) => { console.error(err); });
   }, CHECK_RSS_RESOURCES_TIME);
 };
 
@@ -76,13 +76,14 @@ const runApp = (initialState) => {
 
     elements.rssAddForm.addEventListener('submit', (evt) => {
       evt.preventDefault();
+      watchedState.rssFormState = RSS_FORM_STATE.START;
       const rssUrl = new FormData(elements.rssAddForm).get('url');
-      validateRss(rssUrl, watchedState)
+      const { rss } = watchedState;
+      validateRss(rssUrl, rss)
         .then((isValid) => {
           if (!isValid) {
             throw new Error(RSS_FORM_STATE.INVALID_URL);
           }
-          watchedState.rssFormState = RSS_FORM_STATE.START;
           return loadRssResource(rssUrl);
         })
         .then((data) => {
