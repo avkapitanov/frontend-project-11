@@ -154,30 +154,52 @@ const renderPostsBlock = (watchedState, elements, i18n) => {
   renderPosts(watchedState, elements, i18n);
 };
 
+const setInProgressFormStatus = (elements) => {
+  const { addBtnSpinner, addBtn } = elements;
+  addBtnSpinner.classList.remove('visually-hidden');
+  addBtn.setAttribute('disabled', 'disabled');
+  renderStatusMessage(elements, '');
+};
+
+const setInvalidFormStatus = (elements, error, i18n) => {
+  const { rssFormInput, addBtnSpinner } = elements;
+  rssFormInput.classList.add('is-invalid');
+  addBtnSpinner.classList.add('visually-hidden');
+  if (error !== null) {
+    renderStatusMessage(elements, i18n.t(`rssLoadMessages.${error}`), 'danger');
+  }
+};
+
+const setSentFormStatus = (elements) => {
+  const {
+    addBtnSpinner, addBtn, rssFormInput, rssAddForm,
+  } = elements;
+  addBtnSpinner.classList.add('visually-hidden');
+  addBtn.removeAttribute('disabled');
+  rssFormInput.classList.remove('is-invalid');
+  rssAddForm.reset();
+  rssFormInput.focus();
+};
+
+const setFillingFormStatus = (elements) => {
+  const { addBtnSpinner, addBtn } = elements;
+  addBtnSpinner.classList.add('visually-hidden');
+  addBtn.removeAttribute('disabled');
+};
+
 const processRssFormStatus = (value, error, elements, i18n) => {
   switch (value) {
     case RSS_FORM_STATE.IN_PROGRESS:
-      elements.addBtnSpinner.classList.remove('visually-hidden');
-      elements.addBtn.setAttribute('disabled', 'disabled');
-      renderStatusMessage(elements, '');
+      setInProgressFormStatus(elements);
       break;
     case RSS_FORM_STATE.INVALID:
-      elements.rssFormInput.classList.add('is-invalid');
-      elements.addBtnSpinner.classList.add('visually-hidden');
-      if (error !== null) {
-        renderStatusMessage(elements, i18n.t(`rssLoadMessages.${error}`), 'danger');
-      }
+      setInvalidFormStatus(elements, error, i18n);
       break;
     case RSS_FORM_STATE.SENT:
-      elements.addBtnSpinner.classList.add('visually-hidden');
-      elements.addBtn.removeAttribute('disabled');
-      elements.rssFormInput.classList.remove('is-invalid');
-      elements.rssAddForm.reset();
-      elements.rssFormInput.focus();
+      setSentFormStatus(elements);
       break;
     case RSS_FORM_STATE.FILLING:
-      elements.addBtnSpinner.classList.add('visually-hidden');
-      elements.addBtn.removeAttribute('disabled');
+      setFillingFormStatus(elements);
       break;
     default:
       throw new Error(`Unknown form status: ${value}`);

@@ -19,6 +19,7 @@ export const APP_ERRORS = {
 };
 
 export const LOADING_PROCESS_STATE = {
+  IDLE: 'idle',
   FAILED: 'failed',
   SUCCEEDED: 'succeeded',
 };

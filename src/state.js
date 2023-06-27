@@ -9,7 +9,7 @@ export default () => ({
     readPosts: [],
   },
   loadingProcess: {
-    status: LOADING_PROCESS_STATE.SUCCEEDED,
+    status: LOADING_PROCESS_STATE.IDLE,
     error: null,
   },
   form: {
