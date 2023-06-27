@@ -1,12 +1,20 @@
 import uniqueId from 'lodash.uniqueid';
+import { LOADING_PROCESS_STATE, RSS_FORM_STATE } from './const';
 
 export default () => ({
   rss: [],
   posts: [],
-  rssFormState: '',
   watchedPost: null,
   uiState: {
     readPosts: [],
+  },
+  loadingProcess: {
+    status: LOADING_PROCESS_STATE.SUCCEEDED,
+    error: null,
+  },
+  form: {
+    status: RSS_FORM_STATE.FILLING,
+    error: null,
   },
 });
 

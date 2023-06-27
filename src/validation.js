@@ -1,5 +1,5 @@
 import { string } from 'yup';
-import { RSS_FORM_STATE } from './const';
+import { APP_ERRORS } from './const';
 
 export default (rssLink, rss) => {
   const rssSchema = string()
@@ -11,7 +11,7 @@ export default (rssLink, rss) => {
         return true;
       }
 
-      throw new Error(RSS_FORM_STATE.URL_ALREADY_EXISTS);
+      throw new Error(APP_ERRORS.URL_ALREADY_EXISTS);
     });
 
   return rssSchema.isValid(rssLink);

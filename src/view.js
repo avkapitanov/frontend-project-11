@@ -1,4 +1,4 @@
-import { RSS_FORM_STATE } from './const';
+import { LOADING_PROCESS_STATE, RSS_FORM_STATE } from './const';
 
 const renderFeedsList = (state, elements) => {
   const { rss } = state;
@@ -76,7 +76,7 @@ const renderPosts = (state, elements, i18n) => {
   postList.append(list);
 };
 
-const renderRssFormStatusMessage = (elements, text, type = 'success') => {
+const renderStatusMessage = (elements, text, type = 'success') => {
   const { feedback } = elements;
   const removeCls = type === 'success' ? 'danger' : 'success';
   feedback.innerHTML = text;
@@ -125,46 +125,6 @@ const showModal = (value, elements) => {
   modalDetailLink.setAttribute('href', link);
 };
 
-const showStartState = (elements) => {
-  elements.addBtnSpinner.classList.remove('visually-hidden');
-  elements.addBtn.setAttribute('disabled', 'disabled');
-  renderRssFormStatusMessage(elements, '');
-};
-
-const showLoadedState = (value, elements, i18n) => {
-  elements.rssFormInput.classList.remove('is-invalid');
-  elements.rssAddForm.reset();
-  elements.rssFormInput.focus();
-  elements.addBtnSpinner.classList.add('visually-hidden');
-  renderRssFormStatusMessage(elements, i18n.t(`rssLoadMessages.${value}`), 'success');
-};
-
-const processRssFormState = (value, elements, i18n) => {
-  switch (value) {
-    case RSS_FORM_STATE.START:
-      showStartState(elements);
-      break;
-    case RSS_FORM_STATE.LOADED:
-      showLoadedState(value, elements, i18n);
-      break;
-    case RSS_FORM_STATE.INVALID_RSS:
-    case RSS_FORM_STATE.INVALID_URL:
-    case RSS_FORM_STATE.URL_ALREADY_EXISTS:
-    case RSS_FORM_STATE.EMPTY_URL:
-    case RSS_FORM_STATE.NETWORK_ERR:
-      elements.rssFormInput.classList.add('is-invalid');
-      elements.addBtnSpinner.classList.add('visually-hidden');
-      renderRssFormStatusMessage(elements, i18n.t(`rssLoadMessages.${value}`), 'danger');
-      break;
-    case RSS_FORM_STATE.WAIT:
-      elements.addBtnSpinner.classList.add('visually-hidden');
-      elements.addBtn.removeAttribute('disabled');
-      break;
-    default:
-      throw new Error(`Unknown form state: ${value}`);
-  }
-};
-
 const markReadPost = (postId) => {
   const postLink = document.querySelector(`[data-post-id="${postId}"]`);
   postLink.classList.remove('fw-bold');
@@ -194,6 +154,51 @@ const renderPostsBlock = (watchedState, elements, i18n) => {
   renderPosts(watchedState, elements, i18n);
 };
 
+const processRssFormStatus = (value, error, elements, i18n) => {
+  switch (value) {
+    case RSS_FORM_STATE.IN_PROGRESS:
+      elements.addBtnSpinner.classList.remove('visually-hidden');
+      elements.addBtn.setAttribute('disabled', 'disabled');
+      renderStatusMessage(elements, '');
+      break;
+    case RSS_FORM_STATE.INVALID:
+      elements.rssFormInput.classList.add('is-invalid');
+      elements.addBtnSpinner.classList.add('visually-hidden');
+      if (error !== null) {
+        renderStatusMessage(elements, i18n.t(`rssLoadMessages.${error}`), 'danger');
+      }
+      break;
+    case RSS_FORM_STATE.SENT:
+      elements.addBtnSpinner.classList.add('visually-hidden');
+      elements.addBtn.removeAttribute('disabled');
+      elements.rssFormInput.classList.remove('is-invalid');
+      elements.rssAddForm.reset();
+      elements.rssFormInput.focus();
+      break;
+    case RSS_FORM_STATE.FILLING:
+      elements.addBtnSpinner.classList.add('visually-hidden');
+      elements.addBtn.removeAttribute('disabled');
+      break;
+    default:
+      throw new Error(`Unknown form status: ${value}`);
+  }
+};
+
+const handleLoadingProcess = (value, error, elements, i18n) => {
+  switch (value) {
+    case LOADING_PROCESS_STATE.SUCCEEDED:
+      renderStatusMessage(elements, i18n.t('rssLoadMessages.loaded'));
+      break;
+    case LOADING_PROCESS_STATE.FAILED:
+      if (error !== null) {
+        renderStatusMessage(elements, i18n.t(`rssLoadMessages.${error}`), 'danger');
+      }
+      break;
+    default:
+      throw new Error(`Unknown form status: ${value}`);
+  }
+};
+
 const render = (path, value, watchedState, i18n, elements) => {
   switch (path) {
     case 'rss':
@@ -202,9 +207,18 @@ const render = (path, value, watchedState, i18n, elements) => {
     case 'posts':
       renderPostsBlock(watchedState, elements, i18n);
       break;
-    case 'rssFormState':
-      processRssFormState(value, elements, i18n);
+    case 'loadingProcess.status':
+    case 'loadingProcess.error': {
+      const { loadingProcess } = watchedState;
+      handleLoadingProcess(loadingProcess.status, loadingProcess.error, elements, i18n);
       break;
+    }
+    case 'form.status':
+    case 'form.error': {
+      const { form } = watchedState;
+      processRssFormStatus(form.status, form.error, elements, i18n);
+      break;
+    }
     case 'watchedPost':
       if (value !== null) {
         showModal(value, elements);

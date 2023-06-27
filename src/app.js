@@ -6,7 +6,9 @@ import validateRss from './validation';
 import loadRssResource from './api';
 import parseData from './parser';
 import { savePosts, saveRss } from './state';
-import { CHECK_RSS_RESOURCES_TIME, DEFAULT_APP_LANGUAGE, RSS_FORM_STATE } from './const';
+import {
+  APP_ERRORS, CHECK_RSS_RESOURCES_TIME, DEFAULT_APP_LANGUAGE, LOADING_PROCESS_STATE, RSS_FORM_STATE,
+} from './const';
 import render, { fillAppTexts } from './view';
 
 const checkRssResources = (state) => {
@@ -19,9 +21,9 @@ const checkRssResources = (state) => {
 
           savePosts(state.posts, posts, rssId);
         });
-        checkRssResources(state);
       })
-      .catch((err) => { console.error(err); });
+      .catch((err) => { console.error(err); })
+      .finally(() => { checkRssResources(state); });
   }, CHECK_RSS_RESOURCES_TIME);
 };
 
@@ -51,8 +53,8 @@ const getUIElements = () => ({
 const setCustomYupLocale = () => {
   setLocale({
     string: {
-      url: RSS_FORM_STATE.INVALID_URL,
-      required: RSS_FORM_STATE.EMPTY_URL,
+      url: APP_ERRORS.INVALID_URL,
+      required: APP_ERRORS.EMPTY_URL,
     },
   });
 };
@@ -76,13 +78,18 @@ const runApp = (initialState) => {
 
     elements.rssAddForm.addEventListener('submit', (evt) => {
       evt.preventDefault();
-      watchedState.rssFormState = RSS_FORM_STATE.START;
+
+      watchedState.form.status = RSS_FORM_STATE.IN_PROGRESS;
+      watchedState.form.error = null;
+      watchedState.loadingProcess.error = null;
+
       const rssUrl = new FormData(elements.rssAddForm).get('url');
       const { rss } = watchedState;
       validateRss(rssUrl, rss)
         .then((isValid) => {
           if (!isValid) {
-            throw new Error(RSS_FORM_STATE.INVALID_URL);
+            watchedState.form.status = RSS_FORM_STATE.INVALID;
+            throw new Error(APP_ERRORS.INVALID_URL);
           }
           return loadRssResource(rssUrl);
         })
@@ -91,18 +98,23 @@ const runApp = (initialState) => {
           const newRssItem = saveRss(watchedState.rss, rssFeed, rssUrl);
           const { id: rssId } = newRssItem;
           savePosts(watchedState.posts, posts, rssId);
-          watchedState.rssFormState = RSS_FORM_STATE.LOADED;
-          checkRssResources(watchedState);
+          watchedState.loadingProcess.status = LOADING_PROCESS_STATE.SUCCEEDED;
+          watchedState.form.status = RSS_FORM_STATE.SENT;
         })
         .catch((error) => {
+          if (error.parseErrorText) {
+            console.error(error.parseErrorText);
+          }
+
+          watchedState.loadingProcess.status = LOADING_PROCESS_STATE.FAILED;
           if (error.isAxiosError) {
-            watchedState.rssFormState = RSS_FORM_STATE.NETWORK_ERR;
+            watchedState.loadingProcess.error = APP_ERRORS.NETWORK_ERR;
           } else {
-            watchedState.rssFormState = error.message;
+            watchedState.loadingProcess.error = error.message;
           }
         })
         .finally(() => {
-          watchedState.rssFormState = RSS_FORM_STATE.WAIT;
+          watchedState.form.status = RSS_FORM_STATE.FILLING;
         });
     });
 
@@ -129,6 +141,8 @@ const runApp = (initialState) => {
           });
       });
     });
+
+    checkRssResources(watchedState);
   });
 };
 
